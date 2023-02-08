@@ -369,7 +369,7 @@ function Fload_level(STRING* AName)
 		fade_in();
 		wait(-2);
 		wait(1);
-		pssm_run(0);
+	//	pssm_run(0);
 		level_load(NULL);
 		fglobalstop=1;
 		wait(1);
@@ -388,7 +388,7 @@ function Fload_level(STRING* AName)
 		set(you, SHADOW);
 		reset(Eweapon,SHADOW);
 		if ((VtimeH >= 6) && (VtimeH <= 17)){
-			pssm_run(4);
+		//	pssm_run(4);
 		}
 		snd_play(doorcl, 80, 0);
 		fade_out();
@@ -863,34 +863,34 @@ action AQuestGrass()
 
 action AGrass2()
 {
-	//ent_remove(me);
-		set(my, PASSABLE);
-		reset(my,DYNAMIC);
-		reset(my,SHADOW);
-		wait(-5);
-		reset(my,SHADOW);
+	ent_remove(me);
+//		set(my, PASSABLE);
+//		reset(my,DYNAMIC);
+//		reset(my,SHADOW);
+//		wait(-5);
+//		reset(my,SHADOW);
 }
 
 action AGrass()
 {
-//	ent_remove(me);
-		set(my, PASSABLE);
-		wait(-5);
-		reset(my,SHADOW);
-		while (1)
-		{
-				if (!(my.eflags&CLIPPED))
-				{
-						my.skill1 += 3 * time_step; // torso animation
-						if (my.skill1 > 100) {
-								my.skill1 = 0;
-						}
-						ent_animate(me, "Base", my.skill1, ANM_CYCLE);
-						wait(2);
-				}
-				else
-				{wait(-1);}
-		}
+	ent_remove(me);
+//		set(my, PASSABLE);
+//		wait(-5);
+//		reset(my,SHADOW);
+//		while (1)
+//		{
+//				if (!(my.eflags&CLIPPED))
+//				{
+//						my.skill1 += 3 * time_step; // torso animation
+//						if (my.skill1 > 100) {
+//								my.skill1 = 0;
+//						}
+//						ent_animate(me, "Base", my.skill1, ANM_CYCLE);
+//						wait(2);
+//				}
+//				else
+//				{wait(-1);}
+//		}
 }
 
 function toggle_rain_timer()
@@ -955,11 +955,11 @@ function main()
 	sc_bWater = 1;
 	sc_bReflect = 1;
 	sc_bVolParts = 1;
-		sc_setup();
+//		sc_setup();
 	camera.clip_near = 1; 
 	camera.clip_far  = 1000000;
 	//we want the Depth of Field Effect to autofocus objects, so activate the autofocus
-		sc_dofDynFocus(100,900000,1);
+	//	sc_dofDynFocus(100,900000,1);
 	//we want dynamic softshadows, so activate them
 	//sc_smSunSetup(screen_size.x, 2000, 150, 0.0002, 0);
 	//setup sky
@@ -975,7 +975,7 @@ function main()
 	sc_lightRayStr = 0.6; //set light ray strength
 	sc_lightRayLength = 6.5; //set light ray length
 
-		sc_lightRays();
+	//	sc_lightRays();
 
 
 	bmap_to_cubemap(map_envMap);
@@ -989,7 +989,7 @@ function main()
 	pssm_res = 2048;
 	pssm_splitweight = 1;
 	pssm_transparency=0.5;
-	pssm_run(4);
+//	pssm_run(4);
 	VDay = 1;
 	toggle_rain_timer();
 	//	camera.fog_start=100;
@@ -1063,7 +1063,7 @@ function FSetSky(int ADayTime)
 		vec_set(ambient_color, vector(50, 50, 50)) ;
 		if (VDay == 0) {
 			VDay = 1;
-			pssm_run(4);
+		//	pssm_run(4);
 		}
 	}
 	else
@@ -1071,7 +1071,7 @@ function FSetSky(int ADayTime)
 		vec_set(ambient_color, vector(20, 20, 20));
 		if (VDay == 1) {
 			VDay = 0;
-			pssm_run(0);
+		//	pssm_run(0);
 		}
 	}
 

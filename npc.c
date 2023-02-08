@@ -90,7 +90,7 @@ action ABabushka()
 						if (key_pressed(280))
 						{
 							if (snd_playing(talk_handle)==0)
-							{snd_stopall(4);  wait(1);
+							{ 
 								if (my.skill2<5)
 								{
 									talk_handle = ent_playsound(my, babushka2, 700);
@@ -165,7 +165,7 @@ action miner()
 
 action ADragon()
 {
-	var talk_handle=0;
+	var talk_handle1=0;
 	EDragon=me;
 	set(my,PASSABLE);
 	if (gmover==0)
@@ -179,8 +179,8 @@ action ADragon()
 			else
 			{
 				if (my.skill2<1)
-				{snd_stopall(4);  wait(1);
-					talk_handle=snd_play(dragon, 100, 0);
+				{  wait(1);
+					talk_handle1=snd_play(dragon, 100, 0);
 				}
 				my.skill2=1;
 				gmover=1;
