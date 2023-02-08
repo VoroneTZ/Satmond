@@ -28,8 +28,8 @@
 
 
 #define SExp skill15
-SOUND* sheepsnd = "sheep3.wav";
-SOUND* cutsheepsnd = "cut.wav";
+SOUND* sheepsnd = "sheep3.ogg";
+SOUND* cutsheepsnd = "cut.ogg";
 
 //VARIABLES
 var compass_x,compass_y,m_x,m_y;
@@ -56,17 +56,14 @@ var vLevel=1;
 STRING* vTextureName= "                      ";
 STRING* vSpellName="                      ";
 
-var rain_handle; // handle for the rain.wav sound
+var rain_handle=0; // handle for the rain.wav sound
 VECTOR vPlayer;
 
 //ENTITES
 
 BMAP* map_envMap = "sky04S+6.tga"; //an environment map for later use in a shader
 
-SOUND* track1="track1.ogg";
-SOUND* track2="track2.ogg";
-SOUND* track3="track3.ogg";
-SOUND* track4="track4.ogg";
+
 
 
 ENTITY*  elf_1;
@@ -324,7 +321,7 @@ action ASun()
 	set(my, PASSABLE);
 	my.scale_x=my.scale_x*2;
 	my.scale_y=my.scale_y*2;
-	while (1)
+	while (fglobalstop==1)
 	{
 		
 		if (VtimeH <= 11) {
@@ -355,22 +352,26 @@ action ASun()
 		wait(1);
 	}
 }
-SOUND* doorcl="door_cl.wav";
-SOUND* doorop="door_op.wav";
+SOUND* doorcl="door_cl.ogg";
+SOUND* doorop="door_op.ogg";
 
 function Fload_level(STRING* AName)
 {
 	if (vlevelload==0)
 	{
+		fglobalstop=0;
+		wait(10);
+		snd_stopall(4); 
+		wait(1);
 		vlevelload=1;
 		snd_play(doorop, 80, 0);
 		wait(1);
 		fade_in();
 		wait(-2);
 		wait(1);
-			pssm_run(0);
+		pssm_run(0);
 		level_load(NULL);
-		
+		fglobalstop=1;
 		wait(1);
 		level_load(AName);
 		reset(PSleep,SHOW);
@@ -387,7 +388,7 @@ function Fload_level(STRING* AName)
 		set(you, SHADOW);
 		reset(Eweapon,SHADOW);
 		if ((VtimeH >= 6) && (VtimeH <= 17)){
-				pssm_run(4);
+			pssm_run(4);
 		}
 		snd_play(doorcl, 80, 0);
 		fade_out();
@@ -401,7 +402,7 @@ function Fload_level(STRING* AName)
 action ABed()
 {
 	while (!player){wait(1);}
-	while (1)
+	while (fglobalstop==1)
 	{
 		wait(4);
 		if (!(my.eflags&CLIPPED))
@@ -447,7 +448,7 @@ action ABed()
 
 action ADoor()
 {
-	while (1)
+	while (fglobalstop==1)
 	{	
 		if (vec_dist(my.x, player.x) < 100)
 		{
@@ -523,7 +524,7 @@ function SwordAttEvent()
 action ASwordAtt()
 {
 	my.skill2=5;
-	my.skill1=you.SParStrenth;
+	my.skill1=you.SParStrenth/2;
 	set(my,NARROW);
 	set(my,INVISIBLE);
 	my.pan=you.pan;
@@ -569,22 +570,26 @@ function FUseWeapon(ENTITY* AChar)
 
 
 
-SOUND* fireball_wav = "explo.wav";
+SOUND* fireball_wav = "explo.ogg";
 function FireBallEvent()
 {
-	var handle;
+	
 	my.skill2=0;
 	effect(flm_part_func3, 1, my.x, nullvector);
 	wait (1);
 	my.event = NULL; 
-	handle = ent_playsound(my, fireball_wav, 200);
+	if (snd_playing(hexplo)!=0)
+	{
+		snd_stop(hexplo);wait(1);
+	}
+	hexplo=ent_playsound(my, fireball_wav, 200);
 	
 	if (you){you.SHealth -=my.skill1;}
 	
 	
 	set (my, INVISIBLE);
 	set (my, PASSABLE);
-	while(snd_playing(handle)!=0){wait(1);}
+	wait(-1);
 	ent_remove (my);
 	
 }
@@ -592,12 +597,15 @@ function FireBallEvent()
 action ATarget()
 {
 	my.SHealth=1;
-	while (my.SHealth>0)
+	while ((my.SHealth>0)&&(fglobalstop==1))
 	{
 		wait(5);
 	} 
-	if (FDedQuest == 7){FSheepHair+=1;}
-	if (FSheepHair==3){FDedQuest=8;}
+	if (fglobalstop==1)
+	{
+		if (FDedQuest == 7){FSheepHair+=1;}
+		if (FSheepHair==3){FDedQuest=8;}
+	}
 	ent_remove(me);
 }
 
@@ -605,7 +613,11 @@ action AFireBall()
 {
 	my.skill2=100;
 	my.skill1=you.SParInt*8;
-	ent_playloop(my, fire, 100);
+	if (snd_playing(hfire)!=0)
+	{
+		snd_stop(hfire);wait(1);
+	}
+	hfire = ent_playloop(my, fire, 100);
 	set(my,NARROW);
 	set(my,INVISIBLE);
 	my.pan=you.pan;
@@ -624,12 +636,13 @@ action AFireBall()
 		
 		wait(1);
 	}	
+	snd_stop(hfire);
 	wait(-2);`
 	ent_remove(me);
 }
 
-SOUND* mgc1="gate_open.wav";
-SOUND* mgc2="gate_close.wav";
+SOUND* mgc1="gate_open.ogg";
+SOUND* mgc2="gate_close.ogg";
 
 function FCastSpell(int ASpellId, ENTITY* AChar)
 {
@@ -675,7 +688,7 @@ void ent_heatFlare()
 
 	VECTOR tempPos;
 
-	while (1)
+	while (fglobalstop==1)
 	{
 		//behave like a sprite -> face camera
 		vec_set(tempPos, camera.x);
@@ -725,9 +738,9 @@ action ASheep()
 	my.skill2=0;
 	my.red   = 128;
 	my.green = 128;
-	var sndhandle;
+	var sndhandle=0;
 	my.blue  = 0;
-	while (1)
+	while (fglobalstop==1)
 	{
 		if (VtimeH>6 && VtimeH<19)
 		{
@@ -803,9 +816,9 @@ action AQuestGrass()
 	my.red   = 128;
 	my.green = 128;
 	my.blue  = 0;
-	var snd_handle;
+	var snd_handle=0;
 	var LGet=0;
-	while (LGet<5)
+	while ((LGet<5)&&(fglobalstop==1))
 	{
 		if (!(my.eflags&CLIPPED))
 		{
@@ -839,14 +852,18 @@ action AQuestGrass()
 
 		wait(2);
 	}
-	set(my,INVISIBLE);
-	my.lightrange=0;
-	while(snd_playing(snd_handle)!=0){wait(1);}
-	ent_remove(me);
+	if (fglobalstop==1)
+	{
+		set(my,INVISIBLE);
+		my.lightrange=0;
+		while(snd_playing(snd_handle)!=0){wait(1);}
+		ent_remove(me);
+	}
 }
 
 action AGrass2()
 {
+	//ent_remove(me);
 		set(my, PASSABLE);
 		reset(my,DYNAMIC);
 		reset(my,SHADOW);
@@ -856,8 +873,7 @@ action AGrass2()
 
 action AGrass()
 {
-
-	
+//	ent_remove(me);
 		set(my, PASSABLE);
 		wait(-5);
 		reset(my,SHADOW);
@@ -918,8 +934,8 @@ function main()
 	panel_red.alpha=0;
 	panel_black.alpha=100;
 	camera.arc = 60;
-	detail_size = 100;music_handle = media_play ("tap1.wav", NULL, 100);
-	shadow_stencil = 0;
+	detail_size = 100;
+	shadow_stencil = 8;
 	FStart_New_Game();
 	VCameraSensitivity = 10;
 	
@@ -936,14 +952,14 @@ function main()
 	sc_bHDR = 1;
 	sc_bDOF = 1;
 	sc_bRefract = 1;
-	sc_bWater = 0;
-	sc_bReflect = 0;
+	sc_bWater = 1;
+	sc_bReflect = 1;
 	sc_bVolParts = 1;
 		sc_setup();
 	camera.clip_near = 1; 
 	camera.clip_far  = 1000000;
 	//we want the Depth of Field Effect to autofocus objects, so activate the autofocus
-	sc_dofDynFocus(100,900000,1);
+		sc_dofDynFocus(100,900000,1);
 	//we want dynamic softshadows, so activate them
 	//sc_smSunSetup(screen_size.x, 2000, 150, 0.0002, 0);
 	//setup sky
@@ -959,7 +975,6 @@ function main()
 	sc_lightRayStr = 0.6; //set light ray strength
 	sc_lightRayLength = 6.5; //set light ray length
 
-
 		sc_lightRays();
 
 
@@ -974,7 +989,7 @@ function main()
 	pssm_res = 2048;
 	pssm_splitweight = 1;
 	pssm_transparency=0.5;
-		pssm_run(4);
+	pssm_run(4);
 	VDay = 1;
 	toggle_rain_timer();
 	//	camera.fog_start=100;
@@ -992,6 +1007,35 @@ function main()
 	on_4= Spell4;
 	camera.fog_start = 0; // fog starts at 80% of clip range
 	camera.fog_end = 10000; 
+	
+	var piece_number;	
+	var music_handle = 0;
+	while (1)
+	{
+		if (media_playing (music_handle) == 0)
+		{
+			random_seed(0);
+			piece_number = integer(random(3)+1 );
+			if (piece_number == 1)
+			{
+				music_handle=	media_play("track1.mp3", NULL, 100);
+			}
+			if (piece_number == 2)
+			{
+				music_handle=	media_play("track2.mp3", NULL, 100);
+			}
+			if (piece_number == 3)
+			{
+				music_handle=	media_play("track3.mp3", NULL, 100);
+			}
+			if (piece_number == 4)
+			{
+				music_handle=	media_play("track4.mp3", NULL, 100);
+			}
+			
+		}
+		wait(-1);
+	}
 }
 
 
@@ -1019,7 +1063,7 @@ function FSetSky(int ADayTime)
 		vec_set(ambient_color, vector(50, 50, 50)) ;
 		if (VDay == 0) {
 			VDay = 1;
-				pssm_run(4);
+			pssm_run(4);
 		}
 	}
 	else
@@ -1027,7 +1071,7 @@ function FSetSky(int ADayTime)
 		vec_set(ambient_color, vector(20, 20, 20));
 		if (VDay == 1) {
 			VDay = 0;
-				pssm_run(0);
+			pssm_run(0);
 		}
 	}
 
@@ -1267,9 +1311,9 @@ function FSetSky(int ADayTime)
 SOUND* water_snd = "lp_flus.ogg";
 SOUND* unwater_snd = "lp_lava.ogg";
 
-SOUND* tap1 = "tap.wav";
-SOUND* tap2 = "toprak.wav";
-SOUND* tap3 = "splash.wav";
+SOUND* tap1 = "tap.ogg";
+SOUND* tap2 = "toprak.ogg";
+SOUND* tap3 = "splash.ogg";
 
 function HitPan()
 {
@@ -1294,7 +1338,8 @@ action APlayer()
 	my.SParInt = vParInt;
 	my.SEnergy = VEnergy;
 	my.SExp =vExp;
-	var waterHandle;
+	var waterHandle=0;
+	var htap=0;
 	waterHandle = snd_loop(water_snd, 0, 0);
 	var unwaterHandle = snd_loop(unwater_snd, 0, 0);
 	set(my, FLAG2);
@@ -1315,11 +1360,11 @@ action APlayer()
 	set(my, INVISIBLE);
 	FSetSky(VtimeH);
 	
-	var piece_number;
+
 	var temph, tempm;
 	var lfootstep;me.SAttack = 0;
 
-	while (my.SHealth >= 1)
+	while ((my.SHealth >= 1)&&(fglobalstop==1))
 	{//////////                    13.52
 		if (my.SFall>0){my.SFall-=time_step;}
 		if (vAir>244){my.SHealth-=time_step;}
@@ -1353,28 +1398,8 @@ action APlayer()
 			{vAir+=(2-(vParStamina/10))*time_step;}
 			set(air_pan,SHOW);
 		}
-		if (snd_playing (music_handle) == 0)
-		{
-			random_seed(0);
-			piece_number = integer(random(3)+1 );
-			if (piece_number == 1)
-			{
-				music_handle=	snd_play(track1, 100, 0);
-			}
-			if (piece_number == 2)
-			{
-				music_handle=	snd_play(track2, 100, 0);
-			}
-			if (piece_number == 3)
-			{
-				music_handle=	snd_play(track3, 100, 0);
-			}
-			if (piece_number == 4)
-			{
-				music_handle=	snd_play(track4, 100, 0);
-			}
-			
-		}
+		
+		
 
 
 
@@ -1429,14 +1454,18 @@ action APlayer()
 		Ldist_ahead = Lwalk_speed * (key_w - key_s) * time_step;
 		
 		lfootstep+=abs(Ldist_ahead);
-		if (lfootstep>60){
+		if (lfootstep>70){
 			lfootstep=0;
 			if (hit.texname){
 			str_cpy(vTextureName, hit.texname);}
-		if (my.z<35){ if (camera.z>0){snd_play(tap3,20,0);}} else
-			if (str_cmpi("ZONE1.HMP",vTextureName)){snd_play(tap2,20,0);}
+			if (snd_playing(htap)!=0)
+			{
+				snd_stop(htap);wait(1);
+			}
+		if (my.z<35){ if (camera.z>0){htap=snd_play(tap3,20,0);}} else
+			if (str_cmpi("ZONE1.HMP",vTextureName)){htap=snd_play(tap2,20,0);}
 			else
-			{snd_play(tap1,20,0);}
+			{htap=snd_play(tap1,20,0);}
 		}
 		
 		
@@ -1535,14 +1564,19 @@ action APlayer()
 
 		wait(1);
 	}
-	compass_x=((460/(30+(my.SParStamina*4)))*((30+(my.SParStamina*4))-my.SHealth));		
-	m_x=(245/(30+(my.SParInt*4)))*((30+(my.SParInt*4))-VMana);
-	HitPan();
-	fade_in();
-	wait(-2);
+	if (fglobalstop==1)
+	{
+		compass_x=((460/(30+(my.SParStamina*4)))*((30+(my.SParStamina*4))-my.SHealth));		
+		m_x=(245/(30+(my.SParInt*4)))*((30+(my.SParInt*4))-VMana);
+		HitPan();
+		fade_in();
+		wait(-2);
+		snd_stop(waterHandle);
+		FKillChar(me);
+		FKillChar(Eweapon);
+	}
 	snd_stop(waterHandle);
-	FKillChar(me);
-	FKillChar(Eweapon);
+	snd_stop(unwaterHandle);
 }
 
 function FStart_New_Game()
@@ -1574,7 +1608,7 @@ action ent_heatFlare()
 
 	VECTOR tempPos;
 
-	while (1)
+	while (fglobalstop==1)
 	{
 		//behave like a sprite -> face camera
 		if (!(my.eflags&CLIPPED))
@@ -1587,31 +1621,6 @@ action ent_heatFlare()
 	}
 }
 
-action ShadowLvl()
-{
-	mat_model.effect = "sc_obj_doShadow.fx";
-}
-
-action AInvis()
-{
-	set(my, TRANSLUCENT);
-
-
-	while (1)
-	{
-		if (my.alpha < 100)
-		{
-			my.alpha = my.alpha + 1 * time_step;
-		}
-		else
-		{
-			my.alpha = 0;
-		}
-		wait (1);
-	}
-
-	reset(my, TRANSLUCENT);
-}
 
 
 
@@ -1633,7 +1642,7 @@ action my_mouse()
 	VECTOR direction[3];
 	var LDestroy=0;
 
-	while(LDestroy==0)
+	while((LDestroy==0)&&(fglobalstop==1))
 
 	{
 		if ((VtimeH>6 && VtimeH<19)|| (is(my,FLAG3)))
@@ -1718,7 +1727,7 @@ action AFish()
 	VECTOR direction[3];
 	var LDestroy=0;
 
-	while(LDestroy==0)
+	while((LDestroy==0)&&(fglobalstop==1))
 
 	{
 		

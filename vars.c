@@ -18,7 +18,13 @@ var VtimeS = 0;
 var VtimeH = 0;
 var VtimeM = 1;
 var Vcave=0;
-var music_handle = 0;
+
+var hexplo=0;
+var hfire=0;
+var hhit=0;
+var hmis=0;
+var fglobalstop=1;
+
 
 SOUND* hitsnd="hit.wav";
 SOUND* misssnd="miss.wav";

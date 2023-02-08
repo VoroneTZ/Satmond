@@ -1,3 +1,5 @@
+#include "vars.c"
+
 BMAP* effect_RainBmap = "rain.tga";
 var Fstop_rain=0;
 SOUND* fire = "fireplace.ogg";
@@ -49,11 +51,15 @@ function toggle_rain2()
 	
 	while (Fstop_rain>0)
 	{
+		if (snd_playing(rainHandle)==0)
+		{
+			rainHandle = snd_loop(whamm_snd, lvolume, 0);
+		}
 		if (lvolume<50)
 		{
 			lvolume=lvolume+0.1;			
 		}
-		if (camera.z<0){snd_tune(rainHandle,1,0,0);}else{snd_tune(rainHandle,lvolume,0,0);}
+	if (camera.z<0){snd_tune(rainHandle,1,0,0);}else{snd_tune(rainHandle,lvolume,0,0);}
 		Fstop_rain-=0.1;
 		rain_origin.x = player.x + 250 - random(500);
 		rain_origin.y = player.y + 250 - random(500);
@@ -69,6 +75,7 @@ function toggle_rain2()
 	}
 	while (lvolume>0)
 	{
+		if (snd_playing(rainHandle)==0){rainHandle = snd_loop(whamm_snd, lvolume, 0);}
 		if (camera.z<0){snd_tune(rainHandle,1,0,0);} else 
 		{
 			snd_tune(rainHandle,lvolume,0,0);
@@ -92,7 +99,7 @@ action HaloLight()
 	set(my,OVERLAY);
 	set(my,TRANSLUCENT);
 	my.alpha = 0;	
-	while(1)
+	while(fglobalstop==1)
 	{
 		if (vec_dist(player.x,my.x)<3000)
 		{	
@@ -242,13 +249,28 @@ action init_flame()
 	var whosh_handle;
 	whosh_handle = ent_playloop(my, fire, 100);
 
-	while (1)
+	while (fglobalstop==1)
 	{
+		if (vec_dist(camera.x,my.x)<500)
+		{
+			if (snd_playing(whosh_handle)==0)
+			{
+				whosh_handle = ent_playloop(my, fire, 100);
+			}
+		}
+		else
+		{
+			if (!snd_playing(whosh_handle))
+			{
+				snd_stop(whosh_handle);
+			}
+		}
 		my.lightrange = maxv(40, minv(150, (my.lightrange + random(10) - 5)));
 		effect(flm_part_func, 1, my.x, nullvector);
 		effect(smoke_part_func, 1, my.x, nullvector);
 		wait(1);
 	}
+	snd_stop(whosh_handle);
 }
 
 action ACrystal()
@@ -262,9 +284,9 @@ action ACrystal()
 	var lr=50;
 	var dir=0;
 
-	while (1)
+	while (fglobalstop==1)
 	{
-		if (dir==0){lr+=1*time_step;}else{lr-=1*time_step;}
+	if (dir==0){lr+=1*time_step;}else{lr-=1*time_step;}
 		if (lr>100){dir=1;}
 		if (lr<50){dir=0;}
 		my.lightrange = lr;

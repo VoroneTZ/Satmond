@@ -34,14 +34,14 @@ action ABabushka()
 {
 	var linitpan=my.pan;
 	var lnewpan;
-	var talk_handle;
+	var talk_handle=0;
 	VECTOR temp;
 	while (!player) {
 		wait(1);
 	}
 	if (gmover==0)
 	{
-		while(1)
+		while(fglobalstop==1)
 		{
 			my.skill1 += 3 * time_step; // torso animation
 			if (my.skill1 > 100) {
@@ -61,6 +61,7 @@ action ABabushka()
 					if (my.skill2==0)
 					{
 						my.skill2=2;
+						snd_stopall(4);  wait(1);
 						talk_handle = ent_playsound(my, babushka1, 700);
 					}
 					else
@@ -69,7 +70,9 @@ action ABabushka()
 						if (key_pressed(280))
 						{
 							if (snd_playing(talk_handle)==0)
-							talk_handle = ent_playsound(my, babushka1, 700);
+							{snd_stopall(4);  wait(1);
+								talk_handle = ent_playsound(my, babushka1, 700);
+							}
 						}
 						
 					}
@@ -78,7 +81,7 @@ action ABabushka()
 				{
 					if (my.skill2==0)
 					{
-						my.skill2=2;
+						my.skill2=2;snd_stopall(4);  wait(1);
 						talk_handle = ent_playsound(my, babushka2, 700);
 					}
 					else
@@ -87,8 +90,18 @@ action ABabushka()
 						if (key_pressed(280))
 						{
 							if (snd_playing(talk_handle)==0)
-							talk_handle = ent_playsound(my, babushka2, 700);
+							{snd_stopall(4);  wait(1);
+								if (my.skill2<5)
+								{
+									talk_handle = ent_playsound(my, babushka2, 700);
+								}
+								else
+								{
+									talk_handle = ent_playsound(my, babushka3, 700);
+								}
+							}
 						}
+						
 						
 					}
 				}
@@ -121,12 +134,13 @@ action ABabushka()
 			wait(1);
 		}
 	}
+	snd_stop(talk_handle);
 	ent_remove(me);
 }
 
 action dragontrigger()
 {
-	while(1)
+	while(fglobalstop==1)
 	{
 		if (my.skill16<0)
 		{
@@ -138,7 +152,7 @@ action dragontrigger()
 
 action miner()
 {
-	while(1)
+	while(fglobalstop==1)
 	{
 		my.skill1 += 3 * time_step; // torso animation
 		if (my.skill1 > 100) {
@@ -151,12 +165,12 @@ action miner()
 
 action ADragon()
 {
-	var talk_handle;
+	var talk_handle=0;
 	EDragon=me;
 	set(my,PASSABLE);
 	if (gmover==0)
 	{
-		while(1)
+		while(fglobalstop==1)
 		{
 			if (my.skill16>0)
 			{
@@ -165,8 +179,8 @@ action ADragon()
 			else
 			{
 				if (my.skill2<1)
-				{
-					snd_play(dragon, 100, 0);
+				{snd_stopall(4);  wait(1);
+					talk_handle=snd_play(dragon, 100, 0);
 				}
 				my.skill2=1;
 				gmover=1;
@@ -185,7 +199,7 @@ action AVillager()
 	while(!player){wait(1);}
 	var anekdot;
 	anekdot=ent_playsound(my, tt, 1);
-	while (1)
+	while (fglobalstop==1)
 	{
 		
 		if (snd_playing(anekdot)==0)
@@ -199,7 +213,7 @@ action AVillager()
 			if (vec_dist(player.x,my.x)<100)
 			{
 				if (key_pressed(280))
-				{
+				{snd_stopall(4);  wait(1);
 					anekdot=ent_playsound(my, sndanekdot, 700);
 				}
 			}
@@ -216,6 +230,7 @@ action AVillager()
 
 		wait(1);
 	}
+	snd_stop(anekdot);
 }
 
 function hit_player(var Apower)
@@ -250,12 +265,13 @@ action ADed ()
 	
 	var linitpan=my.pan;
 	var lnewpan;
-	var talk_handle;
+	var talk_handle=0;
+	
 	VECTOR temp;
 	while (!player) {
 		wait(1);
 	}
-	while(1)
+	while(fglobalstop==1)
 	{
 		my.skill1 += 3 * time_step; // torso animation
 		if (my.skill1 > 100) {
@@ -272,7 +288,7 @@ action ADed ()
 			vec_to_angle(my.pan, temp);
 			if (FDedQuest == 0)
 			{
-				FDedQuest = 1;
+				FDedQuest = 1;snd_stopall(4);  wait(1);
 				talk_handle = ent_playsound(my, ded1, 700);
 			}
 			if (FDedQuest == 1)
@@ -286,7 +302,7 @@ action ADed ()
 			if (FDedQuest == 2)
 			{
 				vExp+=1;
-				FDedQuest = 3;
+				FDedQuest = 3;snd_stopall(4);  wait(1);
 				talk_handle = ent_playsound(my, ded2, 700);
 			}
 			if (FDedQuest == 3)
@@ -300,7 +316,7 @@ action ADed ()
 			if (FDedQuest == 4)
 			{
 				FDedQuest = 5;
-				vExp+=1;
+				vExp+=1;snd_stopall(4);  wait(1);
 				talk_handle = ent_playsound(my, ded3, 700);
 				my.skill1 =0;
 				while(my.skill1<90)
@@ -325,7 +341,7 @@ action ADed ()
 			if (FDedQuest == 6)
 			{
 				FDedQuest = 7;
-				vExp+=1;
+				vExp+=1;snd_stopall(4);  wait(1);
 				talk_handle = ent_playsound(my, ded4, 700);
 				FSheepHair=0;
 			}
@@ -340,7 +356,7 @@ action ADed ()
 			if (FDedQuest == 8)
 			{
 				FDedQuest = 9;
-				vExp+=1;
+				vExp+=1;snd_stopall(4); wait(1); 
 				talk_handle = ent_playsound(my, ded5, 700);
 			}
 			if (FDedQuest == 9)
@@ -354,7 +370,7 @@ action ADed ()
 			if (FDedQuest == 10)
 			{
 				FDedQuest = 11;
-				vExp+=1;
+				vExp+=1;snd_stopall(4);  wait(1);
 				talk_handle = ent_playsound(my, ded6, 700);
 			}
 			if (FDedQuest == 11)
@@ -375,6 +391,7 @@ action ADed ()
 		my.roll=0;
 		wait(1);
 	}
+	snd_stop(talk_handle);
 }
 
 
@@ -386,7 +403,7 @@ action AAxle()
 	while (!player) {
 		wait(1);
 	}
-	while (GetAxle == 0)
+	while ((GetAxle == 0)&&(fglobalstop==1))
 	{
 		if (LSayQuest==1)
 		{
@@ -487,7 +504,7 @@ action npc_action()
 	my.emask |= ENABLE_TRIGGER;
 	my.event = npc_event;
 	my.trigger_range = 200;
-	var talk_handle;
+	var talk_handle=0;
 	talk_handle = ent_playsound(my, tt, 700);
 	//	vec_set(my.min_x, vector(-my.RadiusSize, -my.RadiusSize, -my.SizeOffset));
 	//	vec_set(my.max_x, vector(my.RadiusSize, my.RadiusSize, my.SizeOffset));
@@ -495,7 +512,7 @@ action npc_action()
 	var Lanim_percent;
 	set(my, SHADOW | CAST);
 	
-	while (my.skill2>0) {
+	while ((my.skill2>0)&&(fglobalstop==1)) {
 		
 		pp=pathDist/100;
 		if (pp>41)
@@ -516,6 +533,7 @@ action npc_action()
 				if (LSayQuest == 0)
 				{
 					LSayQuest = 1;
+					snd_stopall(4); wait(1);
 					talk_handle = ent_playsound(my, man, 700);
 				}
 				else
@@ -525,7 +543,9 @@ action npc_action()
 						if (key_pressed(280))
 						{
 							if (snd_playing(talk_handle)==0)
-							talk_handle = ent_playsound(my, man, 700);
+							{snd_stopall(4);  wait(1);
+								talk_handle = ent_playsound(my, man, 700);
+							}
 						}
 					}
 				}
@@ -565,7 +585,7 @@ action npc_action()
 		wait(1);
 	}
 	my.skill1 = 0;
-	
+	snd_stop(talk_handle);
 	//snd_handle1=snd_play(snd_death_enemy,50,0);
 	
 	ent_remove(me);
@@ -687,17 +707,18 @@ action npc_enemy()
 	var pathDist = 0;		//Stores walked distance over the path
 	my.skill20=0;
 	set(my,SHADOW|CAST);
-	while(my.SHealth>0) 
+	while((my.SHealth>0)&&(fglobalstop==1)) 
 	{
 		
 		if ((is(my,FLAG4)==false)||(VtimeH<5))
 		{
-			if (is(my,FLAG4)==false)
+			if (is(my,FLAG4))
 			{
 				if (my.skill20>0)
 				{
 					effect(flm_part_func3, 1, my.x, nullvector);
 					my.skill20-=1*time_step;
+					wait(1);
 				}
 			}
 			reset(my,PASSABLE);
@@ -727,47 +748,50 @@ action npc_enemy()
 			
 		}
 		else
+		if (is(my,FLAG4))
 		{ 
 			if (my.skill20<20)
 			{
 				effect(flm_part_func3, 1, my.x, nullvector);
 				my.skill20+=1*time_step;
+				wait(1);
 			}
 			set(my,PASSABLE);
 			set(my,INVISIBLE);
 		}
 		wait(1);
 	}
-	
-	if (is(my,FLAG5))
+	if (fglobalstop==1)
 	{
-		
-		my.skill20=1;
-		ent_playsound(me,gop2,600);
-		
-	}
-	my.emask = NULL;
-	my.skill1=0;	set(my,PASSABLE);
-	if (is(my,FLAG4))
-	{
-		if (FDedQuest==9)
-		{FDedQuest = 10;}
-	}
-	while(my.skill1<80) 
-	{
-		my.skill1 += 3*time_step;
-		ent_animate(me,"death",my.skill1,ANM_CYCLE);
-		wait(1);
-	}
+		if (is(my,FLAG5))
+		{
+			
+			my.skill20=1;
+			ent_playsound(me,gop2,600);
+			
+		}
+		my.emask = NULL;
+		my.skill1=0;	set(my,PASSABLE);
+		if (is(my,FLAG4))
+		{
+			if (FDedQuest==9)
+			{FDedQuest = 10;}
+		}
+		while(my.skill1<80) 
+		{
+			my.skill1 += 3*time_step;
+			ent_animate(me,"death",my.skill1,ANM_CYCLE);
+			wait(1);
+		}
 
-	my.skill1=0;
-	set(my,TRANSLUCENT);
-	while(my.skill1<100) 
-	{
-		my.skill1+=0.5*time_step;	
-		my.alpha=100-my.skill1;
-		wait(1);	
+		my.skill1=0;
+		set(my,TRANSLUCENT);
+		while(my.skill1<100) 
+		{
+			my.skill1+=0.5*time_step;	
+			my.alpha=100-my.skill1;
+			wait(1);	
+		}
 	}
-
 	ent_remove(me); 
 }

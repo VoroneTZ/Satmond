@@ -45,7 +45,7 @@ SOUND* snd_jump = "toprak.wav";
 SOUND* snd_player_hit = "toprak.wav";
 SOUND* snd_death_enemy = "toprak.wav";
 SOUND* snd_player_hit_enemy = "toprak.wav";
-var snd_handle1;
+var snd_handle1=0;
 var fallsnd;
 var isAttack = 0;
 
