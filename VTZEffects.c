@@ -1,5 +1,5 @@
 #include "vars.c"
-
+#include <mtlFX.c>
 BMAP* effect_RainBmap = "rain.tga";
 var Fstop_rain=0;
 SOUND* fire = "fireplace.ogg";
@@ -273,6 +273,22 @@ action init_flame()
 	snd_stop(whosh_handle);
 }
 
+MATERIAL* mat_smaragd =
+{  
+//	ambient_blue = 100; 
+//	ambient_green = 255; 
+//	ambient_red = 100; 
+//	diffuse_blue = 0; 
+//	diffuse_green = 100;  
+//	diffuse_red = 0; 
+//	specular_blue = 255; 
+//	specular_green = 255;  
+//	specular_red = 255; '
+emissive_blue = 100;  emissive_green = 255;  emissive_red = 100;
+	power = 10;
+	
+}
+
 action ACrystal()
 {
 	set(my,TRANSLUCENT);
@@ -283,7 +299,7 @@ action ACrystal()
 	my.blue  = 255;
 	var lr=50;
 	var dir=0;
-
+//	my.material=mat_smaragd;
 	while (fglobalstop==1)
 	{
 	if (dir==0){lr+=1*time_step;}else{lr-=1*time_step;}
@@ -292,4 +308,90 @@ action ACrystal()
 		my.lightrange = lr;
 		wait(1);
 	}
+}
+
+
+#define number_of_vertices 1089
+var vertex_array[1089]; 
+var counter;
+var index;
+
+#define amplitude skill15
+#define water_speed skill6
+
+
+action AWaterEntity()
+{
+	VECTOR temp;
+	set(my,TRANSLUCENT);
+	
+	set(my,PASSABLE);
+	
+	
+	my.material = mtl_water_mirror;
+	
+	BMAP* bump = bmap_for_entity(my,0); 
+	if (bump) bmap_to_uv(bump);
+	fx_mirror();	// activate mirror view
+	
+	// copy shader parameters to vecSkill41	
+	if (my.skill1) { my.skill41 = floatd(my.skill1,10000); }
+	else { my.skill41 = floatd(2,10000); }
+	if (my.skill2) { my.skill42 = floatd(my.skill2,10000); }
+	else { my.skill42 = floatd(2,10000); }
+	if (my.skill3) { my.skill43 = floatv(my.skill3*0.1); }
+	else { my.skill43 = floatv(0.2*0.1); }
+	if (my.skill4) { my.skill44 = floatv(my.skill4); }
+	else { my.skill44 = floatv(0.5); }
+	
+	if (my.skill5)
+	{ 
+		vec_set(my.blue,vector(my.skill5,my.skill6,my.skill7)); 
+	}
+	else 
+	{ 
+		vec_set(my.blue,vector(240,200,200)); 
+	}
+	
+	//	if (my.skill15 == 0) 
+	//	{ 
+		my.skill15 = 0.7; // default wave amplitude value
+	//	}
+	//	if (my.water_speed == 0) 
+	//	{ 
+		my.water_speed = 4; // default wave speed value
+	//}
+	counter = 0;
+	while (counter < number_of_vertices) 
+	{
+		vertex_array[counter] = random(360); // set random values in vertex_array
+		counter += 1;
+	}
+	
+	
+	while(1) 
+	{
+		if (!is(my,CLIPPED)) 
+		{
+			
+			index = 0;
+			while (index < number_of_vertices) 
+			{
+				vec_for_mesh(temp, my, index); // store the vertex coordinates in temp
+				temp.z = sin(counter + vertex_array[index]) * my.amplitude; // change the z component
+				vec_to_mesh(temp, my, index); // deform the terrain entity
+				index += 1; 
+			}
+			counter += my.water_speed * time_step;
+			
+			vec_for_max(view_mirror.portal_x,my);
+			vec_add(view_mirror.portal_x,my.x);
+			mtlfx_mirrorvisible = 1;
+			
+		}
+		wait(1);
+	}
+	
+	
+
 }

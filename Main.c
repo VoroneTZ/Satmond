@@ -12,11 +12,13 @@
 #include <d3d9.h>
 #include <acknex.h>
 #include <default.c>
+#include <mtlFX.c>
+#include <mtlView.c>
 #include "sc_core.c"
 //#include "sc_water.c"
 
-#include <mtlFX.c>
-#include <mtlView.c>
+
+
 #include "npc.c"
 #include <shadows.c>
 #include "VTZEffects.c"
@@ -316,7 +318,8 @@ action AWeapon()
 action ASun()
 {
 	set(my,LIGHT);
-	VECTOR temp; sc_skill(my, sc_myDepth, 2);
+	VECTOR temp;
+	 sc_skill(my, sc_myDepth, 2);
 	var t, p;
 	set(my, PASSABLE);
 	my.scale_x=my.scale_x*2;
@@ -369,7 +372,7 @@ function Fload_level(STRING* AName)
 		fade_in();
 		wait(-2);
 		wait(1);
-	//	pssm_run(0);
+			pssm_run(0);
 		level_load(NULL);
 		fglobalstop=1;
 		wait(1);
@@ -388,7 +391,7 @@ function Fload_level(STRING* AName)
 		set(you, SHADOW);
 		reset(Eweapon,SHADOW);
 		if ((VtimeH >= 6) && (VtimeH <= 17)){
-		//	pssm_run(4);
+				pssm_run(4);
 		}
 		snd_play(doorcl, 80, 0);
 		fade_out();
@@ -864,33 +867,33 @@ action AQuestGrass()
 action AGrass2()
 {
 	ent_remove(me);
-//		set(my, PASSABLE);
-//		reset(my,DYNAMIC);
-//		reset(my,SHADOW);
-//		wait(-5);
-//		reset(my,SHADOW);
+	//		set(my, PASSABLE);
+	//		reset(my,DYNAMIC);
+	//		reset(my,SHADOW);
+	//		wait(-5);
+	//		reset(my,SHADOW);
 }
 
 action AGrass()
 {
 	ent_remove(me);
-//		set(my, PASSABLE);
-//		wait(-5);
-//		reset(my,SHADOW);
-//		while (1)
-//		{
-//				if (!(my.eflags&CLIPPED))
-//				{
-//						my.skill1 += 3 * time_step; // torso animation
-//						if (my.skill1 > 100) {
-//								my.skill1 = 0;
-//						}
-//						ent_animate(me, "Base", my.skill1, ANM_CYCLE);
-//						wait(2);
-//				}
-//				else
-//				{wait(-1);}
-//		}
+	//		set(my, PASSABLE);
+	//		wait(-5);
+	//		reset(my,SHADOW);
+	//		while (1)
+	//		{
+		//				if (!(my.eflags&CLIPPED))
+		//				{
+			//						my.skill1 += 3 * time_step; // torso animation
+			//						if (my.skill1 > 100) {
+				//								my.skill1 = 0;
+			//						}
+			//						ent_animate(me, "Base", my.skill1, ANM_CYCLE);
+			//						wait(2);
+		//				}
+		//				else
+		//				{wait(-1);}
+	//		}
 }
 
 function toggle_rain_timer()
@@ -922,7 +925,8 @@ function toggle_rain_timer()
 
 function main()
 {
-	
+	d3d_automaterial=4;
+	d3d_antialias = 4;
 	vec_set(d3d_lodfactor,vector(1,1.5,1.5));
 	warn_level = 3; 
 	shadow_lod = 1;
@@ -955,11 +959,11 @@ function main()
 	sc_bWater = 1;
 	sc_bReflect = 1;
 	sc_bVolParts = 1;
-//		sc_setup();
+			sc_setup();
 	camera.clip_near = 1; 
 	camera.clip_far  = 1000000;
 	//we want the Depth of Field Effect to autofocus objects, so activate the autofocus
-	//	sc_dofDynFocus(100,900000,1);
+		sc_dofDynFocus(100,900000,1);
 	//we want dynamic softshadows, so activate them
 	//sc_smSunSetup(screen_size.x, 2000, 150, 0.0002, 0);
 	//setup sky
@@ -975,7 +979,7 @@ function main()
 	sc_lightRayStr = 0.6; //set light ray strength
 	sc_lightRayLength = 6.5; //set light ray length
 
-	//	sc_lightRays();
+		sc_lightRays();
 
 
 	bmap_to_cubemap(map_envMap);
@@ -989,7 +993,7 @@ function main()
 	pssm_res = 2048;
 	pssm_splitweight = 1;
 	pssm_transparency=0.5;
-//	pssm_run(4);
+		pssm_run(4);
 	VDay = 1;
 	toggle_rain_timer();
 	//	camera.fog_start=100;
@@ -1063,7 +1067,7 @@ function FSetSky(int ADayTime)
 		vec_set(ambient_color, vector(50, 50, 50)) ;
 		if (VDay == 0) {
 			VDay = 1;
-		//	pssm_run(4);
+				pssm_run(4);
 		}
 	}
 	else
@@ -1071,7 +1075,7 @@ function FSetSky(int ADayTime)
 		vec_set(ambient_color, vector(20, 20, 20));
 		if (VDay == 1) {
 			VDay = 0;
-		//	pssm_run(0);
+				pssm_run(0);
 		}
 	}
 
@@ -1329,6 +1333,8 @@ function HitPan()
 
 action APlayer()
 {
+//	set(my,SPOTLIGHT);
+//	my.lightrange=800;
 	my.SHealth = VHealth;
 	my.SMana = VMana;
 	my.SLevel = vLevel;
@@ -1581,7 +1587,7 @@ action APlayer()
 
 function FStart_New_Game()
 {
-	level_load("house.wmb");
+	level_load("cave.wmb");
 
 	//  fog_color = 1;
 	//  camera.fog_start = 1000;
@@ -1593,11 +1599,8 @@ function FStart_New_Game()
 
 }
 
-action AWaterEntity()
-{
-	set(my, PASSABLE);
-	sc_water(my);
-}
+
+
 action ent_heatFlare()
 {
 
